@@ -4,11 +4,12 @@ package com.example.android.todolist.data;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-// TODO (1) Verify that TaskContentProvider extends from ContentProvider and implements required methods
+// completed (1) Verify that TaskContentProvider extends from ContentProvider and implements required methods
 public class TaskContentProvider extends ContentProvider {
 
 
@@ -17,12 +18,14 @@ public class TaskContentProvider extends ContentProvider {
     In this case, you’re working with a SQLite database, so you’ll need to
     initialize a DbHelper to gain access to it.
      */
+    private TaskDbHelper mDBHelper;
     @Override
     public boolean onCreate() {
-        // TODO (2) Complete onCreate() and initialize a TaskDbhelper on startup
+        //  Complete onCreate() and initialize a TaskDbhelper on startup
         // [Hint] Declare the DbHelper as a global variable
-
-        return false;
+        Context context=getContext();
+        mDBHelper=new TaskDbHelper(context);
+        return true;
     }
 
 
