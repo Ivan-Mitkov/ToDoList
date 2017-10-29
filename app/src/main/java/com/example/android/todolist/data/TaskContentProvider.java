@@ -3,10 +3,13 @@
 package com.example.android.todolist.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -54,8 +57,44 @@ public class TaskContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
+// Get access to the task database (to write new data to)
+        // database is final and we are using SQLiteOpenHelper to getWritableDatabase
+        final SQLiteDatabase db = mDBHelper.getWritableDatabase();
+        // Write URI matching code to identify the match for the tasks directory
+        //UriMatcher.match Try to match against the path in a url
+        int match = sUriMatcher.match(uri);
+        // Defines a new Uri object that receives the result of the insertion
+        Uri mNewUri;
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        switch (match){
+            case TASKS:
+                //inserting values into table using SQLiteDatabase insert
+                //db.insert return row ID of the newly inserted row, or -1 if an error occurred
+                long id = db.insert(TaskContract.TaskEntry.TABLE_NAME,null,values);
+                if(id>0){
+                    //success
+                    /*ContentUris are utility methods useful for working with Uri objects
+                    that use the "content" (content://) scheme. Content URIs have the syntax
+                    *content://authority/path/id
+                    *Content URIs appendId returns Uri.builder but Content URIs withAppendedId
+                    *returns uri - that is what we need
+                    */
+                    //Set the value for the returnedUri and write the default case for unknown URI's
+                    mNewUri= ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI,id);
+                }
+                else {
+                    throw new SQLException("Failed to insert row"+uri);
+                }
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri"+uri);
+
+        }
+        //Notify the resolver if the uri has been changed, and return the newly inserted URI
+        //Return a ContentResolver instance and  notify registered observers that a row was updated.
+        getContext().getContentResolver().notifyChange(uri,null);
+        return mNewUri;
     }
 
 

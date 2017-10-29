@@ -2,10 +2,16 @@
 
 package com.example.android.todolist;
 
+import android.content.ContentValues;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.Toast;
+
+import com.example.android.todolist.data.TaskContract;
 
 
 public class AddTaskActivity extends AppCompatActivity {
@@ -29,7 +35,26 @@ public class AddTaskActivity extends AppCompatActivity {
      * It retrieves user input and inserts that new task data into the underlying database.
      */
     public void onClickAddTask(View view) {
-        // Not yet implemented
+        EditText editTask =(EditText)findViewById(R.id.editTextTaskDescription);
+        String task=editTask.getText().toString();
+        ContentValues cv=new ContentValues();
+        // Check if EditText is empty, if not retrieve input and store it in a ContentValues object
+        if(task.length()>0){
+            cv.put(TaskContract.TaskEntry.COLUMN_DESCRIPTION,task);
+            cv.put(TaskContract.TaskEntry.COLUMN_PRIORITY,mPriority);
+            // Insert new task data via a ContentResolver
+            Uri uri =getContentResolver().insert(TaskContract.TaskEntry.CONTENT_URI,cv);
+            // Display the URI that's returned with a Toast
+            if(uri!=null){
+                Toast.makeText(this,uri.toString(),Toast.LENGTH_SHORT).show();
+            }
+
+        }
+        else {
+            return;
+        }
+        // call finish() to return to MainActivity after this insert is complete
+        finish();
     }
 
 
