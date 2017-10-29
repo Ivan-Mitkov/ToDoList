@@ -84,11 +84,13 @@ public class TaskContentProvider extends ContentProvider {
                     //Set the value for the returnedUri and write the default case for unknown URI's
                     mNewUri= ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI,id);
                 }
+
                 else {
                     throw new SQLException("Failed to insert row"+uri);
                 }
 
                 break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri"+uri);
 
@@ -121,6 +123,23 @@ public class TaskContentProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
+            case TASKS_WITH_ID:
+                //we need two stings one for selection and string[] for selectionArgs
+                String mSelection="_id=?";//for selection
+                //getPathSegments gets the decoded path segments as List<String> without '/'
+                // than get() returns the element on position in uri
+                //position 0 is table name, 1 is id wich we need
+                String id=uri.getPathSegments().get(1);
+                String[] mSelectionArgs=new String[]{id};//initializing the array for selectionArgs
+                cursor=db.query(TABLE_NAME,
+                        projection,
+                        mSelection,
+                        mSelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri"+uri);
 
