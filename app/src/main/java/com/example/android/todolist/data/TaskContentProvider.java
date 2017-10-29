@@ -13,14 +13,16 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import static com.example.android.todolist.data.TaskContract.TaskEntry.TABLE_NAME;
+
 
 // completed (1) Verify that TaskContentProvider extends from ContentProvider and implements required methods
 public class TaskContentProvider extends ContentProvider {
     // Define final integer constants for the directory of tasks and a single item.
     // It's convention to use 100, 200, 300, etc for directories,
     // and related ints (101, 102, ..) for items in that directory.
-    private static final int TASKS=100;
-    private static final int TASKS_WITH_ID=101;
+    public static final int TASKS=100;
+    public static final int TASKS_WITH_ID=101;
 
     //declare static UriMatcher for accessing in provider code
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -101,8 +103,31 @@ public class TaskContentProvider extends ContentProvider {
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
+        // Get access to underlying database (read-only for query)
+        final SQLiteDatabase db =mDBHelper.getReadableDatabase();
+        // Write URI match code and set a variable to return a Cursor
+        int match =sUriMatcher.match(uri);
+        Cursor cursor;
+        switch (match){
+            case TASKS:
+                // Query for the tasks directory and write a default case
+                cursor=db.query(
+                        TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri"+uri);
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        }
+        //Set a notification URI on the Cursor and return that Cursor
+        cursor.setNotificationUri(getContext().getContentResolver(),uri);
+        return cursor;
     }
 
 
