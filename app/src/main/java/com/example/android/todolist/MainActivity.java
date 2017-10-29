@@ -4,6 +4,7 @@ package com.example.android.todolist;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -63,7 +64,25 @@ public class MainActivity extends AppCompatActivity implements
             // Called when a user swipes left or right on a ViewHolder
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
+                // first we must take the take the id of element to delete
+                //in cursor adapter we have setTag the id of the view equal to the id of the row
+                //by calling getTag we can retrieve the id of the view
+                int id =(int) viewHolder.itemView.getTag();
+                //  Construct the URI for the item to delete
+                String stringId=Integer.toString(id);
+                Uri uri= TaskContract.TaskEntry.CONTENT_URI;
+
+                //buildUpon() construct new builder returns Uri.Builder
+                //appendPath() Encodes the given segment and appends it to the path returns Uri.Builder
+                //Uri.Builder.build() Constructs a Uri with the current attributes.
+                uri=uri.buildUpon().appendPath(stringId).build();
+
+                //call content resolver to delete
+                getContentResolver().delete(uri,null,null);
+
+                //UI has changed because of deletion so we call Loader manager to update the view
+                getSupportLoaderManager().restartLoader(TASK_LOADER_ID, null,MainActivity.this);
+
             }
         }).attachToRecyclerView(mRecyclerView);
 
