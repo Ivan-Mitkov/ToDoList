@@ -45,6 +45,8 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
     public TaskViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         // Inflate the task_layout to a view
+        //Obtains the LayoutInflater from the given context
+        //Inflate a new view hierarchy from the specified xml resource
         View view = LayoutInflater.from(mContext)
                 .inflate(R.layout.task_layout, parent, false);
 
